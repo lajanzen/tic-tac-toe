@@ -1,12 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { calculateWinner } from '../utils/games';
 import Square from './Square';
 
 function Board(): JSX.Element {
-  function renderSquare(i: number) {
-    return <Square />;
+  const [squares, setSquares] = useState<string[]>(Array(9).fill(''));
+  const [xIsNext, setXIsNext] = useState(true);
+
+  const winner = calculateWinner(squares);
+  let status = '';
+  if (winner) {
+    status = 'Winner: ' + winner;
+  } else {
+    status = 'Next player: ' + (xIsNext ? 'X' : 'O');
   }
 
-  const status = 'Next player: X';
+  function handleClick(i: number) {
+    // Falls es bereits Gewinner gibt oder in einem Square schon ein X oder O ist, wird die Funktion mit dem return hier abgebrochen
+    if (calculateWinner(squares) || squares[i]) {
+      return;
+    }
+    const newSquares = squares.slice();
+    newSquares[i] = xIsNext ? 'X' : 'O';
+    setSquares(newSquares);
+    setXIsNext(!xIsNext);
+  }
+
+  function renderSquare(i: number) {
+    return <Square value={squares[i]} onClick={() => handleClick(i)} />;
+  }
 
   return (
     <div>
